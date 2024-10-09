@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/Alcaldias_2.js"></script>
+        <script src="data/TotaldelitosporColonia_3.js"></script>
+        <script src="data/Robodevehiculoconviolencia_4.js"></script>
+        <script src="data/Robodevehculosinviolencia_5.js"></script>
+        <script src="data/Roboabordodemetrobus_6.js"></script>
+        <script src="data/RoboabordoTaxi_7.js"></script>
+        <script src="data/Roboacasahabitacinconviolencia_8.js"></script>
+        <script src="data/Roboapasajeroabordodemicrobs_9.js"></script>
+        <script src="data/Roboapasajerodelmetro_10.js"></script>
+        <script src="data/Roboaconductorpasajerodevehculo_11.js"></script>
+        <script src="data/Roboatransportista_12.js"></script>
+        <script src="data/Roboacuentahbiente_13.js"></script>
+        <script src="data/Roboanegocio_14.js"></script>
+        <script src="data/Roboarepartidor_15.js"></script>
+        <script src="data/Roboatransente_16.js"></script>
+        <script src="data/LesionesDolosas_17.js"></script>
+        <script src="data/Homicidio_18.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[19.030410519817973,-99.71128393050482],[19.60534499108577,-98.52339636673615]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleSatellite_0;
+        map.createPane('pane_GoogleRoad_1');
+        map.getPane('pane_GoogleRoad_1').style.zIndex = 401;
+        var layer_GoogleRoad_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleRoad_1',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleRoad_1;
+        map.addLayer(layer_GoogleRoad_1);
+        function pop_Alcaldias_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nomgeo'] !== null ? autolinker.link(feature.properties['nomgeo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['cve_mun'] !== null ? autolinker.link(feature.properties['cve_mun'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['g_pnt_2'] !== null ? autolinker.link(feature.properties['g_pnt_2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['geo_shp'] !== null ? autolinker.link(feature.properties['geo_shp'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['frecuencia'] !== null ? autolinker.link(feature.properties['frecuencia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Alcaldias_2_0() {
+            return {
+                pane: 'pane_Alcaldias_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(213,180,60,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Alcaldias_2');
+        map.getPane('pane_Alcaldias_2').style.zIndex = 402;
+        map.getPane('pane_Alcaldias_2').style['mix-blend-mode'] = 'normal';
+        var layer_Alcaldias_2 = new L.geoJson(json_Alcaldias_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Alcaldias_2',
+            layerName: 'layer_Alcaldias_2',
+            pane: 'pane_Alcaldias_2',
+            onEachFeature: pop_Alcaldias_2,
+            style: style_Alcaldias_2_0,
+        });
+        bounds_group.addLayer(layer_Alcaldias_2);
+        map.addLayer(layer_Alcaldias_2);
+        function pop_TotaldelitosporColonia_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">NOMDT</th>\
+                        <td>' + (feature.properties['NOMDT'] !== null ? autolinker.link(feature.properties['NOMDT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia</th>\
+                        <td>' + (feature.properties['NOMUT'] !== null ? autolinker.link(feature.properties['NOMUT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Población total</th>\
+                        <td>' + (feature.properties['POBTOT,N,1'] !== null ? autolinker.link(feature.properties['POBTOT,N,1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Total delitos</th>\
+                        <td>' + (feature.properties['Total'] !== null ? autolinker.link(feature.properties['Total'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Tasa</th>\
+                        <td>' + (feature.properties['tasa'] !== null ? autolinker.link(feature.properties['tasa'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Homicidios</th>\
+                        <td>' + (feature.properties['Homicidios'] !== null ? autolinker.link(feature.properties['Homicidios'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lesiones dolosas</th>\
+                        <td>' + (feature.properties['Lesiones'] !== null ? autolinker.link(feature.properties['Lesiones'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a bordo de taxi</th>\
+                        <td>' + (feature.properties['Robo_taxi'] !== null ? autolinker.link(feature.properties['Robo_taxi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a casa habitación con violencia</th>\
+                        <td>' + (feature.properties['Robo_casa_'] !== null ? autolinker.link(feature.properties['Robo_casa_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a conductor pasajero de vehículo</th>\
+                        <td>' + (feature.properties['Robo_condu'] !== null ? autolinker.link(feature.properties['Robo_condu'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a cuentahabiente</th>\
+                        <td>' + (feature.properties['Robo_cuent'] !== null ? autolinker.link(feature.properties['Robo_cuent'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a negocio</th>\
+                        <td>' + (feature.properties['Robo_negoc'] !== null ? autolinker.link(feature.properties['Robo_negoc'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a bordo de metro</th>\
+                        <td>' + (feature.properties['Robo_metro'] !== null ? autolinker.link(feature.properties['Robo_metro'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a bordo de metrobus</th>\
+                        <td>' + (feature.properties['metrobus'] !== null ? autolinker.link(feature.properties['metrobus'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a bordo de microbús</th>\
+                        <td>' + (feature.properties['Robo_micro'] !== null ? autolinker.link(feature.properties['Robo_micro'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a repartidor</th>\
+                        <td>' + (feature.properties['robo_repar'] !== null ? autolinker.link(feature.properties['robo_repar'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a transeúnte</th>\
+                        <td>' + (feature.properties['robo_trans'] !== null ? autolinker.link(feature.properties['robo_trans'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo a transportista</th>\
+                        <td>' + (feature.properties['robo_tra_1'] !== null ? autolinker.link(feature.properties['robo_tra_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo de vehículo con violencia</th>\
+                        <td>' + (feature.properties['rvcv'] !== null ? autolinker.link(feature.properties['rvcv'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Robo de vehículo sin violencia</th>\
+                        <td>' + (feature.properties['rvsv'] !== null ? autolinker.link(feature.properties['rvsv'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_TotaldelitosporColonia_3_0(feature) {
+            if (feature.properties['Total'] >= 0.000000 && feature.properties['Total'] <= 7.000000 ) {
+                return {
+                pane: 'pane_TotaldelitosporColonia_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(248,236,235,0.7)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total'] >= 7.000000 && feature.properties['Total'] <= 18.000000 ) {
+                return {
+                pane: 'pane_TotaldelitosporColonia_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,208,206,0.7)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total'] >= 18.000000 && feature.properties['Total'] <= 35.000000 ) {
+                return {
+                pane: 'pane_TotaldelitosporColonia_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,131,127,0.7)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total'] >= 35.000000 && feature.properties['Total'] <= 74.000000 ) {
+                return {
+                pane: 'pane_TotaldelitosporColonia_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(191,10,0,0.7)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total'] >= 74.000000 && feature.properties['Total'] <= 176.000000 ) {
+                return {
+                pane: 'pane_TotaldelitosporColonia_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(59,4,1,0.7)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_TotaldelitosporColonia_3');
+        map.getPane('pane_TotaldelitosporColonia_3').style.zIndex = 403;
+        map.getPane('pane_TotaldelitosporColonia_3').style['mix-blend-mode'] = 'normal';
+        var layer_TotaldelitosporColonia_3 = new L.geoJson(json_TotaldelitosporColonia_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_TotaldelitosporColonia_3',
+            layerName: 'layer_TotaldelitosporColonia_3',
+            pane: 'pane_TotaldelitosporColonia_3',
+            onEachFeature: pop_TotaldelitosporColonia_3,
+            style: style_TotaldelitosporColonia_3_0,
+        });
+        bounds_group.addLayer(layer_TotaldelitosporColonia_3);
+        map.addLayer(layer_TotaldelitosporColonia_3);
+        function pop_Robodevehiculoconviolencia_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">delito</th>\
+                        <td>' + (feature.properties['delito'] !== null ? autolinker.link(feature.properties['delito'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Robodevehiculoconviolencia_4_0() {
+            return {
+                pane: 'pane_Robodevehiculoconviolencia_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Robodevehiculoconviolencia_4');
+        map.getPane('pane_Robodevehiculoconviolencia_4').style.zIndex = 404;
+        map.getPane('pane_Robodevehiculoconviolencia_4').style['mix-blend-mode'] = 'normal';
+        var layer_Robodevehiculoconviolencia_4 = new L.geoJson(json_Robodevehiculoconviolencia_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Robodevehiculoconviolencia_4',
+            layerName: 'layer_Robodevehiculoconviolencia_4',
+            pane: 'pane_Robodevehiculoconviolencia_4',
+            onEachFeature: pop_Robodevehiculoconviolencia_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Robodevehiculoconviolencia_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Robodevehiculoconviolencia_4);
+        function pop_Robodevehculosinviolencia_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td class="visible-with-data" id="fecha_inicio">' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['geo_colonia'] !== null ? autolinker.link(feature.properties['geo_colonia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Robodevehculosinviolencia_5_0() {
+            return {
+                pane: 'pane_Robodevehculosinviolencia_5',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(134,134,134,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Robodevehculosinviolencia_5');
+        map.getPane('pane_Robodevehculosinviolencia_5').style.zIndex = 405;
+        map.getPane('pane_Robodevehculosinviolencia_5').style['mix-blend-mode'] = 'normal';
+        var layer_Robodevehculosinviolencia_5 = new L.geoJson(json_Robodevehculosinviolencia_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Robodevehculosinviolencia_5',
+            layerName: 'layer_Robodevehculosinviolencia_5',
+            pane: 'pane_Robodevehculosinviolencia_5',
+            onEachFeature: pop_Robodevehculosinviolencia_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Robodevehculosinviolencia_5_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Robodevehculosinviolencia_5);
+        function pop_Roboabordodemetrobus_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboabordodemetrobus_6_0() {
+            return {
+                pane: 'pane_Roboabordodemetrobus_6',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(169,62,93,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboabordodemetrobus_6');
+        map.getPane('pane_Roboabordodemetrobus_6').style.zIndex = 406;
+        map.getPane('pane_Roboabordodemetrobus_6').style['mix-blend-mode'] = 'normal';
+        var layer_Roboabordodemetrobus_6 = new L.geoJson(json_Roboabordodemetrobus_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboabordodemetrobus_6',
+            layerName: 'layer_Roboabordodemetrobus_6',
+            pane: 'pane_Roboabordodemetrobus_6',
+            onEachFeature: pop_Roboabordodemetrobus_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboabordodemetrobus_6_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboabordodemetrobus_6);
+        function pop_RoboabordoTaxi_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">categoria_delito</th>\
+                        <td>' + (feature.properties['categoria_delito'] !== null ? autolinker.link(feature.properties['categoria_delito'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>geo_colonia</strong><br />' + (feature.properties['geo_colonia'] !== null ? autolinker.link(feature.properties['geo_colonia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['geo_sector'] !== null ? autolinker.link(feature.properties['geo_sector'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_RoboabordoTaxi_7_0() {
+            return {
+                pane: 'pane_RoboabordoTaxi_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,81,145,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_RoboabordoTaxi_7');
+        map.getPane('pane_RoboabordoTaxi_7').style.zIndex = 407;
+        map.getPane('pane_RoboabordoTaxi_7').style['mix-blend-mode'] = 'normal';
+        var layer_RoboabordoTaxi_7 = new L.geoJson(json_RoboabordoTaxi_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RoboabordoTaxi_7',
+            layerName: 'layer_RoboabordoTaxi_7',
+            pane: 'pane_RoboabordoTaxi_7',
+            onEachFeature: pop_RoboabordoTaxi_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_RoboabordoTaxi_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_RoboabordoTaxi_7);
+        function pop_Roboacasahabitacinconviolencia_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['geoy'] !== null ? autolinker.link(feature.properties['geoy'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboacasahabitacinconviolencia_8_0() {
+            return {
+                pane: 'pane_Roboacasahabitacinconviolencia_8',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(124,116,99,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboacasahabitacinconviolencia_8');
+        map.getPane('pane_Roboacasahabitacinconviolencia_8').style.zIndex = 408;
+        map.getPane('pane_Roboacasahabitacinconviolencia_8').style['mix-blend-mode'] = 'normal';
+        var layer_Roboacasahabitacinconviolencia_8 = new L.geoJson(json_Roboacasahabitacinconviolencia_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboacasahabitacinconviolencia_8',
+            layerName: 'layer_Roboacasahabitacinconviolencia_8',
+            pane: 'pane_Roboacasahabitacinconviolencia_8',
+            onEachFeature: pop_Roboacasahabitacinconviolencia_8,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboacasahabitacinconviolencia_8_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboacasahabitacinconviolencia_8);
+        function pop_Roboapasajeroabordodemicrobs_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboapasajeroabordodemicrobs_9_0() {
+            return {
+                pane: 'pane_Roboapasajeroabordodemicrobs_9',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,243,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboapasajeroabordodemicrobs_9');
+        map.getPane('pane_Roboapasajeroabordodemicrobs_9').style.zIndex = 409;
+        map.getPane('pane_Roboapasajeroabordodemicrobs_9').style['mix-blend-mode'] = 'normal';
+        var layer_Roboapasajeroabordodemicrobs_9 = new L.geoJson(json_Roboapasajeroabordodemicrobs_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboapasajeroabordodemicrobs_9',
+            layerName: 'layer_Roboapasajeroabordodemicrobs_9',
+            pane: 'pane_Roboapasajeroabordodemicrobs_9',
+            onEachFeature: pop_Roboapasajeroabordodemicrobs_9,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboapasajeroabordodemicrobs_9_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboapasajeroabordodemicrobs_9);
+        function pop_Roboapasajerodelmetro_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboapasajerodelmetro_10_0() {
+            return {
+                pane: 'pane_Roboapasajerodelmetro_10',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboapasajerodelmetro_10');
+        map.getPane('pane_Roboapasajerodelmetro_10').style.zIndex = 410;
+        map.getPane('pane_Roboapasajerodelmetro_10').style['mix-blend-mode'] = 'normal';
+        var layer_Roboapasajerodelmetro_10 = new L.geoJson(json_Roboapasajerodelmetro_10, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboapasajerodelmetro_10',
+            layerName: 'layer_Roboapasajerodelmetro_10',
+            pane: 'pane_Roboapasajerodelmetro_10',
+            onEachFeature: pop_Roboapasajerodelmetro_10,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboapasajerodelmetro_10_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboapasajerodelmetro_10);
+        function pop_Roboaconductorpasajerodevehculo_11(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboaconductorpasajerodevehculo_11_0() {
+            return {
+                pane: 'pane_Roboaconductorpasajerodevehculo_11',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(19,182,29,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboaconductorpasajerodevehculo_11');
+        map.getPane('pane_Roboaconductorpasajerodevehculo_11').style.zIndex = 411;
+        map.getPane('pane_Roboaconductorpasajerodevehculo_11').style['mix-blend-mode'] = 'normal';
+        var layer_Roboaconductorpasajerodevehculo_11 = new L.geoJson(json_Roboaconductorpasajerodevehculo_11, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboaconductorpasajerodevehculo_11',
+            layerName: 'layer_Roboaconductorpasajerodevehculo_11',
+            pane: 'pane_Roboaconductorpasajerodevehculo_11',
+            onEachFeature: pop_Roboaconductorpasajerodevehculo_11,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboaconductorpasajerodevehculo_11_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboaconductorpasajerodevehculo_11);
+        function pop_Roboatransportista_12(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboatransportista_12_0() {
+            return {
+                pane: 'pane_Roboatransportista_12',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,200,209,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboatransportista_12');
+        map.getPane('pane_Roboatransportista_12').style.zIndex = 412;
+        map.getPane('pane_Roboatransportista_12').style['mix-blend-mode'] = 'normal';
+        var layer_Roboatransportista_12 = new L.geoJson(json_Roboatransportista_12, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboatransportista_12',
+            layerName: 'layer_Roboatransportista_12',
+            pane: 'pane_Roboatransportista_12',
+            onEachFeature: pop_Roboatransportista_12,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboatransportista_12_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboatransportista_12);
+        function pop_Roboacuentahbiente_13(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">hora_inicio</th>\
+                        <td>' + (feature.properties['hora_inicio'] !== null ? autolinker.link(feature.properties['hora_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['day_number'] !== null ? autolinker.link(feature.properties['day_number'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboacuentahbiente_13_0() {
+            return {
+                pane: 'pane_Roboacuentahbiente_13',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(78,80,206,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboacuentahbiente_13');
+        map.getPane('pane_Roboacuentahbiente_13').style.zIndex = 413;
+        map.getPane('pane_Roboacuentahbiente_13').style['mix-blend-mode'] = 'normal';
+        var layer_Roboacuentahbiente_13 = new L.geoJson(json_Roboacuentahbiente_13, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboacuentahbiente_13',
+            layerName: 'layer_Roboacuentahbiente_13',
+            pane: 'pane_Roboacuentahbiente_13',
+            onEachFeature: pop_Roboacuentahbiente_13,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboacuentahbiente_13_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboacuentahbiente_13);
+        function pop_Roboanegocio_14(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">hora_inicio</th>\
+                        <td>' + (feature.properties['hora_inicio'] !== null ? autolinker.link(feature.properties['hora_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboanegocio_14_0() {
+            return {
+                pane: 'pane_Roboanegocio_14',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(125,218,241,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboanegocio_14');
+        map.getPane('pane_Roboanegocio_14').style.zIndex = 414;
+        map.getPane('pane_Roboanegocio_14').style['mix-blend-mode'] = 'normal';
+        var layer_Roboanegocio_14 = new L.geoJson(json_Roboanegocio_14, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboanegocio_14',
+            layerName: 'layer_Roboanegocio_14',
+            pane: 'pane_Roboanegocio_14',
+            onEachFeature: pop_Roboanegocio_14,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboanegocio_14_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboanegocio_14);
+        function pop_Roboarepartidor_15(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboarepartidor_15_0() {
+            return {
+                pane: 'pane_Roboarepartidor_15',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(135,50,74,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboarepartidor_15');
+        map.getPane('pane_Roboarepartidor_15').style.zIndex = 415;
+        map.getPane('pane_Roboarepartidor_15').style['mix-blend-mode'] = 'normal';
+        var layer_Roboarepartidor_15 = new L.geoJson(json_Roboarepartidor_15, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboarepartidor_15',
+            layerName: 'layer_Roboarepartidor_15',
+            pane: 'pane_Roboarepartidor_15',
+            onEachFeature: pop_Roboarepartidor_15,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboarepartidor_15_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboarepartidor_15);
+        function pop_Roboatransente_16(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roboatransente_16_0() {
+            return {
+                pane: 'pane_Roboatransente_16',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(133,182,111,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roboatransente_16');
+        map.getPane('pane_Roboatransente_16').style.zIndex = 416;
+        map.getPane('pane_Roboatransente_16').style['mix-blend-mode'] = 'normal';
+        var layer_Roboatransente_16 = new L.geoJson(json_Roboatransente_16, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roboatransente_16',
+            layerName: 'layer_Roboatransente_16',
+            pane: 'pane_Roboatransente_16',
+            onEachFeature: pop_Roboatransente_16,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Roboatransente_16_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Roboatransente_16);
+        function pop_LesionesDolosas_17(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_LesionesDolosas_17_0() {
+            return {
+                pane: 'pane_LesionesDolosas_17',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(31,120,180,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_LesionesDolosas_17');
+        map.getPane('pane_LesionesDolosas_17').style.zIndex = 417;
+        map.getPane('pane_LesionesDolosas_17').style['mix-blend-mode'] = 'normal';
+        var layer_LesionesDolosas_17 = new L.geoJson(json_LesionesDolosas_17, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LesionesDolosas_17',
+            layerName: 'layer_LesionesDolosas_17',
+            pane: 'pane_LesionesDolosas_17',
+            onEachFeature: pop_LesionesDolosas_17,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_LesionesDolosas_17_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_LesionesDolosas_17);
+        map.addLayer(layer_LesionesDolosas_17);
+        function pop_Homicidio_18(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Carpeta</th>\
+                        <td>' + (feature.properties['carpeta_investigacion'] !== null ? autolinker.link(feature.properties['carpeta_investigacion'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha Inicio</th>\
+                        <td>' + (feature.properties['fecha_inicio'] !== null ? autolinker.link(feature.properties['fecha_inicio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fecha hechos</th>\
+                        <td>' + (feature.properties['fecha_hechos'] !== null ? autolinker.link(feature.properties['fecha_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hora hechos</th>\
+                        <td>' + (feature.properties['hora_hechos'] !== null ? autolinker.link(feature.properties['hora_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Exordio</th>\
+                        <td>' + (feature.properties['exordio'] !== null ? autolinker.link(feature.properties['exordio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Alcaldía hechos</th>\
+                        <td>' + (feature.properties['alcaldia_hechos'] !== null ? autolinker.link(feature.properties['alcaldia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Colonia hechos</th>\
+                        <td>' + (feature.properties['colonia_hechos'] !== null ? autolinker.link(feature.properties['colonia_hechos'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Homicidio_18_0() {
+            return {
+                pane: 'pane_Homicidio_18',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Homicidio_18');
+        map.getPane('pane_Homicidio_18').style.zIndex = 418;
+        map.getPane('pane_Homicidio_18').style['mix-blend-mode'] = 'normal';
+        var layer_Homicidio_18 = new L.geoJson(json_Homicidio_18, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Homicidio_18',
+            layerName: 'layer_Homicidio_18',
+            pane: 'pane_Homicidio_18',
+            onEachFeature: pop_Homicidio_18,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Homicidio_18_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Homicidio_18);
+        map.addLayer(layer_Homicidio_18);
+        var baseMaps = {};
+        var overlaysTree = [
+            {label: '<img src="legend/Homicidio_18.png" /> Homicidio', layer: layer_Homicidio_18},
+            {label: '<img src="legend/LesionesDolosas_17.png" /> Lesiones Dolosas', layer: layer_LesionesDolosas_17},
+            {label: '<img src="legend/Roboatransente_16.png" /> Robo a transeúnte', layer: layer_Roboatransente_16},
+            {label: '<img src="legend/Roboarepartidor_15.png" /> Robo a repartidor', layer: layer_Roboarepartidor_15},
+            {label: '<img src="legend/Roboanegocio_14.png" /> Robo a negocio', layer: layer_Roboanegocio_14},
+            {label: '<img src="legend/Roboacuentahbiente_13.png" /> Robo a cuentahbiente', layer: layer_Roboacuentahbiente_13},
+            {label: '<img src="legend/Roboatransportista_12.png" /> Robo a transportista', layer: layer_Roboatransportista_12},
+            {label: '<img src="legend/Roboaconductorpasajerodevehculo_11.png" /> Robo a conductor- pasajero de vehículo', layer: layer_Roboaconductorpasajerodevehculo_11},
+            {label: '<img src="legend/Roboapasajerodelmetro_10.png" /> Robo a pasajero del metro', layer: layer_Roboapasajerodelmetro_10},
+            {label: '<img src="legend/Roboapasajeroabordodemicrobs_9.png" /> Robo a pasajero a bordo de microbús', layer: layer_Roboapasajeroabordodemicrobs_9},
+            {label: '<img src="legend/Roboacasahabitacinconviolencia_8.png" /> Robo a casa habitación con violencia', layer: layer_Roboacasahabitacinconviolencia_8},
+            {label: '<img src="legend/RoboabordoTaxi_7.png" /> Robo a bordo Taxi', layer: layer_RoboabordoTaxi_7},
+            {label: '<img src="legend/Roboabordodemetrobus_6.png" /> Robo a bordo de metrobus', layer: layer_Roboabordodemetrobus_6},
+            {label: '<img src="legend/Robodevehculosinviolencia_5.png" /> Robo de vehículo sin violencia', layer: layer_Robodevehculosinviolencia_5},
+            {label: '<img src="legend/Robodevehiculoconviolencia_4.png" /> Robo de vehiculo con violencia', layer: layer_Robodevehiculoconviolencia_4},
+            {label: 'Total delitos por Colonia<br /><table><tr><td style="text-align: center;"><img src="legend/TotaldelitosporColonia_3_170.png" /></td><td>1 - 7</td></tr><tr><td style="text-align: center;"><img src="legend/TotaldelitosporColonia_3_7181.png" /></td><td>7 - 18</td></tr><tr><td style="text-align: center;"><img src="legend/TotaldelitosporColonia_3_18352.png" /></td><td>18 - 35</td></tr><tr><td style="text-align: center;"><img src="legend/TotaldelitosporColonia_3_35743.png" /></td><td>35 - 74</td></tr><tr><td style="text-align: center;"><img src="legend/TotaldelitosporColonia_3_741764.png" /></td><td>74 - 176</td></tr></table>', layer: layer_TotaldelitosporColonia_3},
+            {label: '<img src="legend/Alcaldias_2.png" /> Alcaldias', layer: layer_Alcaldias_2},
+            {label: "Google Road", layer: layer_GoogleRoad_1},
+            {label: "Google Satellite", layer: layer_GoogleSatellite_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        </script>
+    </body>
+</html>
